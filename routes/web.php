@@ -15,4 +15,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('pages.application.index');
+    //return view('pages.application.shooting-game');
+    //return view('pages.application.shooting-game2');
 });
+
+Route::get('/json-response', function () {
+
+    return collect([
+        'id' => 1,
+        'name' => 'Safeer',
+        'age' => 35,
+    ])->toJson();
+})->name('json.response');

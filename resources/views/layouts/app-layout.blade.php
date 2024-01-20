@@ -6,7 +6,7 @@
     @include('includes.styles.master-styles')
     @yield('styles')
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{isset($title)?($title?:config('app.name')):config('app.name')}}</title>
+    <title>{{isset($title)?($title!=''?$title:config('app.name')):config('app.name')}}</title>
 </head>
 <body>
     {{$slot}}
