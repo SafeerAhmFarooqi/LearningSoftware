@@ -4,7 +4,7 @@
   trait HandlesDates
   {
     public function initializeDates(){
-        dd($this->dates);
+        //dd($this->selectedDates);
     }
   }
   

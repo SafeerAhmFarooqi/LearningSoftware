@@ -2,8 +2,10 @@
     <div class="calendar-container" 
     x-data="{ 
         open: false,
+        alpineSelectedDates : [], 
     }">
-        <input wire:model="selectedDate" type="text"
+    {{json_encode($selectedDates)}}
+        <input wire:model="selectedDates" type="text"
 
         @foreach ($inputAttributes as $keyAttribute => $inputAttribute)
         @if (!is_string($inputAttribute)) @continue @endif
@@ -90,6 +92,7 @@
 </div>
 
 @assets
+
 <style>
        body {
         font-family: Arial, sans-serif;

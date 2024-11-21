@@ -25,7 +25,7 @@
                 ],  
                 'picker' => 'single',  //single,range defaults to single
                 'multiSelect' => false, //true,false defaults to false
-                'selectedDates' => [//selected dates from backened
+                'preOccupiedDates' => [//selected dates from backened
                     [
                         'startDate' => '2024-12-25', //Y-m-d
                         'endDate' => '2024-12-25', //Y-m-d

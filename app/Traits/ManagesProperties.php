@@ -5,7 +5,9 @@
   {
     public $inputAttributes = [];
     public $picker = 'single'; //single, range
-    public $selectedDate = '';
+    public $multiSelect = false; //single, range
+    public $preOccupiedDates = [];
     public $selectedDates = [];
+    public $disableDates = [];
   }
   
