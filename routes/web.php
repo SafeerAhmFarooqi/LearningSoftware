@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/date-range-picker', function () {
+    return view('date-range-picker');
+});
+
+Route::get('/date-range-picker-2', function () {
+    return view('date-range-picker-2');
+});
+
+Route::post('/date-range-picker', function (Request $request) {
+    dd($request->all());
+})->name('booking.date');
