@@ -139,6 +139,11 @@
 handleDateClick(date, isDisabled, isPreOccupied) {
     if (isDisabled || isPreOccupied) return;
 
+    const isRangeInvalid = (range) => {
+        // Check if any date in the range is either disabled or pre-occupied
+        return range.some(date => this.disableDates.includes(date) || this.preOccupiedDates.includes(date));
+    };
+
     if (this.picker === 'single') {
         // Single picker mode: append or remove dates based on multiSelect
         if (this.multiSelect) {
@@ -165,7 +170,13 @@ handleDateClick(date, isDisabled, isPreOccupied) {
                 } else {
                     // Complete the range with the second click
                     const range = this.getDatesInRange(lastRange[0], date);
-                    this.selectedRanges = [range];
+
+                    if (isRangeInvalid(range)) {
+                        console.log('Invalid range due to disabled or preoccupied dates');
+                        this.selectedRanges = []; // Clear invalid range
+                    } else {
+                        this.selectedRanges = [range];
+                    }
                 }
             } else {
                 // Start a new range
@@ -182,7 +193,13 @@ handleDateClick(date, isDisabled, isPreOccupied) {
                 } else {
                     // Complete the current range
                     const range = this.getDatesInRange(lastRange[0], date);
-                    this.selectedRanges[this.selectedRanges.length - 1] = range;
+
+                    if (isRangeInvalid(range)) {
+                        console.log('Invalid range due to disabled or preoccupied dates');
+                        this.selectedRanges.pop(); // Remove the incomplete range
+                    } else {
+                        this.selectedRanges[this.selectedRanges.length - 1] = range;
+                    }
                 }
             } else {
                 // Start a new range
