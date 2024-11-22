@@ -17,7 +17,7 @@
        >
 
        <!-- Calendar -->
-       <div class="calendar" x-show="open" x-transition x-cloak @click.outside="open = false">
+       <div class="calendar" x-show="open" x-transition x-cloak @click.outside="handleCalendarHide()">
            <div class="navigation">
                <button type="button" @click="prevMonth()"> &lt; Prev </button>
                <div class="month">
@@ -145,6 +145,19 @@
     }
 
     console.log('Selected Dates Array:', JSON.stringify(this.selectedDates));
+},
+handleCalendarHide() {
+    this.open = false;
+
+    if (this.picker === 'range' && !this.multiSelect) {
+        if (this.selectedDates.length < 2) {
+            // Clear incomplete range
+            this.selectedDates = [];
+            console.log('Cleared incomplete range on hide');
+        } else {
+            console.log('Valid range applied on hide:', this.selectedDates);
+        }
+    }
 },
 
 

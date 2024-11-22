@@ -24,7 +24,7 @@
                     'class' => 'form-control',
                 ],  
                 'picker' => 'range',  //single,range defaults to single
-                'multiSelect' => false, //true,false defaults to false
+                //'multiSelect' => true, //true,false defaults to false
                 'preOccupiedDates' => [//selected dates from backened
                     [
                         'startDate' => '2024-12-25', //Y-m-d
