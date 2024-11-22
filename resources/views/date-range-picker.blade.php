@@ -23,8 +23,8 @@
                     'id' => 'booking_range',
                     'class' => 'form-control',
                 ],  
-                'picker' => 'single',  //single,range defaults to single
-                'multiSelect' => true, //true,false defaults to false
+                'picker' => 'range',  //single,range defaults to single
+                'multiSelect' => false, //true,false defaults to false
                 'preOccupiedDates' => [//selected dates from backened
                     [
                         'startDate' => '2024-12-25', //Y-m-d

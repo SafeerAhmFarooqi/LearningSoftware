@@ -16,7 +16,7 @@
            aria-label="Selected Dates"
        >
 
-      
+       <!-- Calendar -->
        <div class="calendar" x-show="open" x-transition x-cloak @click.outside="open = false">
            <div class="navigation">
                <button type="button" @click="prevMonth()"> &lt; Prev </button>
@@ -59,36 +59,34 @@
 
 
 
+
 @assets
 <script>
     function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = []) {
     return {
-        open: false, // Controls calendar visibility
-        multiSelect, // Whether multiple dates can be selected
-        picker, // 'single' or 'range' selection
-        preOccupiedDates: generateDateRange(preOccupiedDates), // Pre-occupied dates
-        disableDates: generateDateRange(disableDates), // Disabled dates
-        currentMonth: new Date().getMonth(), // Current displayed month (0-11)
-        currentYear: new Date().getFullYear(), // Current displayed year
-        selectedDates: [], // Array of selected dates
-        calendarDays: [], // Array to hold the days of the month
+        open: false,
+        multiSelect: multiSelect === true || multiSelect === 'true', // Ensure boolean
+        picker,
+        preOccupiedDates: generateDateRange(preOccupiedDates),
+        disableDates: generateDateRange(disableDates),
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear(),
+        selectedDates: [],
+        calendarDays: [],
         months: [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ],
-        weekdays: ["S", "M", "T", "W", "T", "F", "S"], // Weekday headers
+        weekdays: ["S", "M", "T", "W", "T", "F", "S"],
 
-        // Generate the calendar days for the current month and year
         generateCalendar() {
             const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
             const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
 
             const days = [];
-            // Add leading empty days
             for (let i = 0; i < firstDay; i++) {
                 days.push({ label: "", empty: true });
             }
-            // Add actual days of the month
             for (let i = 1; i <= daysInMonth; i++) {
                 const date = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 days.push({
@@ -102,29 +100,74 @@
             this.calendarDays = days;
         },
 
-        // Handle a date click
         handleDateClick(date, isDisabled, isPreOccupied) {
-            if (isDisabled || isPreOccupied) return;
+    if (isDisabled || isPreOccupied) return;
 
-            if (this.picker === 'single') {
-                this.selectedDates = [date];
-            } else if (this.picker === 'range') {
-                if (this.selectedDates.length === 2) {
-                    this.selectedDates = [date];
-                } else {
-                    this.selectedDates.push(date);
-                    this.selectedDates.sort();
-                }
-            } else if (this.multiSelect) {
-                if (this.selectedDates.includes(date)) {
-                    this.selectedDates = this.selectedDates.filter(d => d !== date);
-                } else {
-                    this.selectedDates.push(date);
-                }
-            }
-        },
+    if (this.picker === 'single' && this.multiSelect) {
+        // Multi-select individual dates
+        if (this.selectedDates.includes(date)) {
+            // Remove the date if already selected
+            this.selectedDates = this.selectedDates.filter(d => d !== date);
+        } else {
+            // Add the date
+            this.selectedDates.push(date);
+        }
+    } else if (this.picker === 'single') {
+        // Single date selection
+        this.selectedDates = [date];
+    } else if (this.picker === 'range' && this.multiSelect) {
+        // Multi-select ranges
+        const lastRange = this.selectedDates[this.selectedDates.length - 1];
+        if (lastRange && lastRange.length === 1) {
+            // Complete the current range
+            const range = [lastRange[0], date].sort(); // Sort to ensure start <= end
+            this.selectedDates[this.selectedDates.length - 1] = range;
+        } else {
+            // Start a new range
+            this.selectedDates.push([date]);
+        }
+    } else if (this.picker === 'range') {
+        // Single range selection (multiSelect: false)
+        if (this.selectedDates.length === 2) {
+            // Reset if any range exists or a click falls inside an existing range
+            this.selectedDates = [date];
+        } else if (this.selectedDates.length === 1) {
+            // Complete the range
+            this.selectedDates.push(date);
+            this.selectedDates.sort(); // Ensure start <= end
+            // Highlight all dates in the range
+            const rangeDates = this.getDatesInRange(this.selectedDates[0], this.selectedDates[1]);
+            this.selectedDates = rangeDates; // Replace with full range
+        } else {
+            // Start a new range
+            this.selectedDates = [date];
+        }
+    }
 
-        // Navigate to the previous month
+    console.log('Selected Dates Array:', JSON.stringify(this.selectedDates));
+},
+
+
+/**
+ * Utility function to generate all dates in a range
+ * @param {String} startDate - The start date (YYYY-MM-DD)
+ * @param {String} endDate - The end date (YYYY-MM-DD)
+ * @returns {Array} Array of dates in the range
+ */
+getDatesInRange(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const dates = [];
+
+    while (start <= end) {
+        dates.push(start.toISOString().split('T')[0]);
+        start.setDate(start.getDate() + 1);
+    }
+
+    return dates;
+},
+
+
         prevMonth() {
             this.currentMonth -= 1;
             if (this.currentMonth < 0) {
@@ -134,7 +177,6 @@
             this.generateCalendar();
         },
 
-        // Navigate to the next month
         nextMonth() {
             this.currentMonth += 1;
             if (this.currentMonth > 11) {
@@ -146,7 +188,6 @@
     };
 }
 
-// Utility function to generate a range of dates
 function generateDateRange(dates) {
     const result = [];
     dates.forEach(range => {
@@ -162,10 +203,11 @@ function generateDateRange(dates) {
 }
 
 
+
 </script>
 
 <style>
-    body, html {
+ body, html {
     overflow: visible;
 }
 
@@ -187,9 +229,9 @@ function generateDateRange(dates) {
     z-index: 1000;
 }
 
-
-
-
+.calendar[x-show="true"] {
+    display: block;
+}
 
 .days {
     display: grid;
@@ -215,8 +257,8 @@ function generateDateRange(dates) {
 }
 
 .day.pre-occupied {
-    background-color: #ccc;
-    color: white;
+    background-color: #2bff00;
+    color: rgb(0, 0, 0);
     font-style: italic;
     cursor: not-allowed;
 }
