@@ -129,15 +129,20 @@
     } else if (this.picker === 'range') {
         // Single range selection (multiSelect: false)
         if (this.selectedDates.length === 2) {
-            // Reset if any range exists or a click falls inside an existing range
+            // Reset if any range exists
             this.selectedDates = [date];
         } else if (this.selectedDates.length === 1) {
-            // Complete the range
-            this.selectedDates.push(date);
-            this.selectedDates.sort(); // Ensure start <= end
-            // Highlight all dates in the range
-            const rangeDates = this.getDatesInRange(this.selectedDates[0], this.selectedDates[1]);
-            this.selectedDates = rangeDates; // Replace with full range
+            if (this.selectedDates[0] === date) {
+                // Selecting the same date twice creates a range
+                this.selectedDates.push(date);
+            } else {
+                // Complete the range
+                this.selectedDates.push(date);
+                this.selectedDates.sort(); // Ensure start <= end
+                // Highlight all dates in the range
+                const rangeDates = this.getDatesInRange(this.selectedDates[0], this.selectedDates[1]);
+                this.selectedDates = rangeDates; // Replace with full range
+            }
         } else {
             // Start a new range
             this.selectedDates = [date];
@@ -146,6 +151,7 @@
 
     console.log('Selected Dates Array:', JSON.stringify(this.selectedDates));
 },
+
 handleCalendarHide() {
     this.open = false;
 
