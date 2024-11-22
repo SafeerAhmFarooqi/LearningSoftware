@@ -136,51 +136,66 @@
     console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
 },
 
-        handleDateClick(date, isDisabled, isPreOccupied) {
-            if (isDisabled || isPreOccupied) return;
+handleDateClick(date, isDisabled, isPreOccupied) {
+    if (isDisabled || isPreOccupied) return;
 
-            if (this.picker === 'single') {
-                // Single picker mode: append or remove dates based on multiSelect
-                if (this.multiSelect) {
-                    // Add or remove individual dates for multi-select
-                    if (this.selectedDates.includes(date)) {
-                        this.selectedDates = this.selectedDates.filter(d => d !== date); // Remove if already selected
-                    } else {
-                        this.selectedDates.push(date); // Add the new date
-                    }
-                } else {
-                    // Single selection only
-                    this.selectedDates = [date];
-                }
-            } else if (this.picker === 'range') {
-                // Range picker logic (unchanged from previous)
-                if (!this.multiSelect) {
-                    // Single range selection
-                    if (this.selectedRanges.length === 1) {
-                        const start = this.selectedRanges[0][0];
-                        const range = this.getDatesInRange(start, date);
-                        this.selectedRanges = [range];
-                    } else {
-                        this.selectedRanges = [[date]];
-                    }
-                } else {
-                    // Multi-range selection
-                    const lastRange = this.selectedRanges[this.selectedRanges.length - 1];
-                    if (lastRange && lastRange.length === 1) {
-                        // Complete the current range
-                        const start = lastRange[0];
-                        const range = this.getDatesInRange(start, date);
-                        this.selectedRanges[this.selectedRanges.length - 1] = range;
-                    } else {
-                        // Start a new range
-                        this.selectedRanges.push([date]);
-                    }
-                }
+    if (this.picker === 'single') {
+        // Single picker mode: append or remove dates based on multiSelect
+        if (this.multiSelect) {
+            // Add or remove individual dates for multi-select
+            if (this.selectedDates.includes(date)) {
+                this.selectedDates = this.selectedDates.filter(d => d !== date); // Remove if already selected
+            } else {
+                this.selectedDates.push(date); // Add the new date
             }
+        } else {
+            // Single selection only
+            this.selectedDates = [date];
+        }
+    } else if (this.picker === 'range') {
+        // Range picker logic
+        if (!this.multiSelect) {
+            // Single range selection
+            if (this.selectedRanges.length === 1) {
+                const lastRange = this.selectedRanges[0];
 
-            console.log('Selected Dates:', JSON.stringify(this.selectedDates));
-            console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
-        },
+                if (lastRange.length === 1 && lastRange[0] === date) {
+                    // Same date clicked twice, treat it as a range with the date repeated
+                    this.selectedRanges = [[date, date]];
+                } else {
+                    // Complete the range with the second click
+                    const range = this.getDatesInRange(lastRange[0], date);
+                    this.selectedRanges = [range];
+                }
+            } else {
+                // Start a new range
+                this.selectedRanges = [[date]];
+            }
+        } else {
+            // Multi-range selection
+            const lastRange = this.selectedRanges[this.selectedRanges.length - 1];
+
+            if (lastRange && lastRange.length === 1) {
+                if (lastRange[0] === date) {
+                    // Same date clicked twice, treat it as a range with the date repeated
+                    this.selectedRanges[this.selectedRanges.length - 1] = [date, date];
+                } else {
+                    // Complete the current range
+                    const range = this.getDatesInRange(lastRange[0], date);
+                    this.selectedRanges[this.selectedRanges.length - 1] = range;
+                }
+            } else {
+                // Start a new range
+                this.selectedRanges.push([date]);
+            }
+        }
+    }
+
+    console.log('Selected Dates:', JSON.stringify(this.selectedDates));
+    console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
+},
+
+
 
         isSelected(date) {
             // Check if a date is selected in 'single' mode
