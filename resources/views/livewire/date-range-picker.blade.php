@@ -4,17 +4,20 @@
          x-init="generateCalendar()">
        <!-- Dynamic Input Field -->
        <input 
-           wire:model="selectedDates"
-           type="text"
-           x-bind:value="selectedDates.join(', ')"
-           @foreach ($inputAttributes as $keyAttribute => $inputAttribute)
-               @if (!is_string($inputAttribute)) @continue @endif
-               {{ ' ' }}{{ $keyAttribute }}="{{ e($inputAttribute) }}"
-           @endforeach
-           @click="open = !open; console.log('Open state:', open)"
-           readonly
-           aria-label="Selected Dates"
-       >
+        wire:model="selectedDates"
+        type="text"
+        x-bind:value="picker === 'range' 
+                        ? selectedRanges.map(range => `[${range.join(', ')}]`).join(', ') 
+                        : selectedDates.join(', ')"
+        x-bind:name="picker === 'range' ? 'selectedRanges' : 'selectedDates'"
+        @foreach ($inputAttributes as $keyAttribute => $inputAttribute)
+            @if (!is_string($inputAttribute)) @continue @endif
+            {{ ' ' }}{{ $keyAttribute }}="{{ e($inputAttribute) }}"
+        @endforeach
+        @click="open = !open; console.log('Open state:', open)"
+        readonly
+        aria-label="Selected Dates"
+   />
 
        <!-- Calendar -->
        <div class="calendar" x-show="open" x-transition x-cloak @click.outside="handleCalendarHide()">
@@ -41,17 +44,18 @@
 
                <!-- Dynamic Calendar Days -->
                <template x-for="day in calendarDays">
-                   <div class="day"
-                        :class="{
-                           'empty': day.empty, 
-                           'selected': selectedDates.includes(day.date),
-                           'pre-occupied': preOccupiedDates.includes(day.date),
-                           'disabled': disableDates.includes(day.date)
-                        }"
-                        @click="handleDateClick(day.date, day.disabled, day.preOccupied)">
-                       <span x-text="day.label"></span>
-                   </div>
-               </template>
+                <div class="day"
+                     :class="{
+                         'empty': day.empty, 
+                         'selected': isSelected(day.date),
+                         'pre-occupied': preOccupiedDates.includes(day.date),
+                         'disabled': disableDates.includes(day.date)
+                     }"
+                     @click="handleDateClick(day.date, day.disabled, day.preOccupied)">
+                    <span x-text="day.label"></span>
+                </div>
+            </template>
+            
            </div>
        </div>
     </div>
@@ -62,7 +66,7 @@
 
 @assets
 <script>
-    function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = []) {
+   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = []) {
     return {
         open: false,
         multiSelect: multiSelect === true || multiSelect === 'true', // Ensure boolean
@@ -71,7 +75,8 @@
         disableDates: generateDateRange(disableDates),
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear(),
-        selectedDates: [],
+        selectedDates: [], // To store dates for 'single' mode
+        selectedRanges: [], // To store ranges for 'range' mode
         calendarDays: [],
         months: [
             "January", "February", "March", "April", "May", "June",
@@ -99,93 +104,105 @@
             }
             this.calendarDays = days;
         },
-
-        handleDateClick(date, isDisabled, isPreOccupied) {
-    if (isDisabled || isPreOccupied) return;
-
-    if (this.picker === 'single' && this.multiSelect) {
-        // Multi-select individual dates
-        if (this.selectedDates.includes(date)) {
-            // Remove the date if already selected
-            this.selectedDates = this.selectedDates.filter(d => d !== date);
-        } else {
-            // Add the date
-            this.selectedDates.push(date);
-        }
-    } else if (this.picker === 'single') {
-        // Single date selection
-        this.selectedDates = [date];
-    } else if (this.picker === 'range' && this.multiSelect) {
-        // Multi-select ranges
-        const lastRange = this.selectedDates[this.selectedDates.length - 1];
-        if (lastRange && lastRange.length === 1) {
-            // Complete the current range
-            const range = [lastRange[0], date].sort(); // Sort to ensure start <= end
-            this.selectedDates[this.selectedDates.length - 1] = range;
-        } else {
-            // Start a new range
-            this.selectedDates.push([date]);
-        }
-    } else if (this.picker === 'range') {
-        // Single range selection (multiSelect: false)
-        if (this.selectedDates.length === 2) {
-            // Reset if any range exists
-            this.selectedDates = [date];
-        } else if (this.selectedDates.length === 1) {
-            if (this.selectedDates[0] === date) {
-                // Selecting the same date twice creates a range
-                this.selectedDates.push(date);
-            } else {
-                // Complete the range
-                this.selectedDates.push(date);
-                this.selectedDates.sort(); // Ensure start <= end
-                // Highlight all dates in the range
-                const rangeDates = this.getDatesInRange(this.selectedDates[0], this.selectedDates[1]);
-                this.selectedDates = rangeDates; // Replace with full range
-            }
-        } else {
-            // Start a new range
-            this.selectedDates = [date];
-        }
-    }
-
-    console.log('Selected Dates Array:', JSON.stringify(this.selectedDates));
-},
-
-handleCalendarHide() {
+        handleCalendarHide() {
     this.open = false;
 
-    if (this.picker === 'range' && !this.multiSelect) {
-        if (this.selectedDates.length < 2) {
-            // Clear incomplete range
-            this.selectedDates = [];
-            console.log('Cleared incomplete range on hide');
+    if (this.picker === 'range') {
+        if (!this.multiSelect) {
+            // Single range selection: handle incomplete ranges
+            if (this.selectedRanges.length === 1) {
+                const lastRange = this.selectedRanges[0];
+                if (lastRange.length < 2) {
+                    // Clear incomplete range
+                    this.selectedRanges = [];
+                    console.log('Cleared incomplete range on hide');
+                }
+            }
         } else {
-            console.log('Valid range applied on hide:', this.selectedDates);
+            // Multi-range selection: Ensure no incomplete ranges
+            this.selectedRanges = this.selectedRanges.filter(range => range.length >= 2);
+            console.log('Filtered incomplete ranges for multi-select on hide');
+        }
+    } else if (this.picker === 'single') {
+        if (!this.multiSelect && this.selectedDates.length > 1) {
+            // Single date mode: Ensure only one date is selected
+            this.selectedDates = [this.selectedDates[0]];
+            console.log('Ensured single date selection on hide');
         }
     }
+
+    // Log the current state of selected dates and ranges
+    console.log('Selected Dates:', JSON.stringify(this.selectedDates));
+    console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
 },
 
+        handleDateClick(date, isDisabled, isPreOccupied) {
+            if (isDisabled || isPreOccupied) return;
 
-/**
- * Utility function to generate all dates in a range
- * @param {String} startDate - The start date (YYYY-MM-DD)
- * @param {String} endDate - The end date (YYYY-MM-DD)
- * @returns {Array} Array of dates in the range
- */
-getDatesInRange(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const dates = [];
+            if (this.picker === 'single') {
+                // Single picker mode: append or remove dates based on multiSelect
+                if (this.multiSelect) {
+                    // Add or remove individual dates for multi-select
+                    if (this.selectedDates.includes(date)) {
+                        this.selectedDates = this.selectedDates.filter(d => d !== date); // Remove if already selected
+                    } else {
+                        this.selectedDates.push(date); // Add the new date
+                    }
+                } else {
+                    // Single selection only
+                    this.selectedDates = [date];
+                }
+            } else if (this.picker === 'range') {
+                // Range picker logic (unchanged from previous)
+                if (!this.multiSelect) {
+                    // Single range selection
+                    if (this.selectedRanges.length === 1) {
+                        const start = this.selectedRanges[0][0];
+                        const range = this.getDatesInRange(start, date);
+                        this.selectedRanges = [range];
+                    } else {
+                        this.selectedRanges = [[date]];
+                    }
+                } else {
+                    // Multi-range selection
+                    const lastRange = this.selectedRanges[this.selectedRanges.length - 1];
+                    if (lastRange && lastRange.length === 1) {
+                        // Complete the current range
+                        const start = lastRange[0];
+                        const range = this.getDatesInRange(start, date);
+                        this.selectedRanges[this.selectedRanges.length - 1] = range;
+                    } else {
+                        // Start a new range
+                        this.selectedRanges.push([date]);
+                    }
+                }
+            }
 
-    while (start <= end) {
-        dates.push(start.toISOString().split('T')[0]);
-        start.setDate(start.getDate() + 1);
-    }
+            console.log('Selected Dates:', JSON.stringify(this.selectedDates));
+            console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
+        },
 
-    return dates;
-},
+        isSelected(date) {
+            // Check if a date is selected in 'single' mode
+            if (this.picker === 'single') {
+                return this.selectedDates.includes(date);
+            }
+            // Check if a date belongs to any range in 'range' mode
+            return this.selectedRanges.some(range => range.includes(date));
+        },
 
+        getDatesInRange(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const dates = [];
+
+            while (start <= end) {
+                dates.push(start.toISOString().split('T')[0]);
+                start.setDate(start.getDate() + 1);
+            }
+
+            return dates;
+        },
 
         prevMonth() {
             this.currentMonth -= 1;
@@ -206,6 +223,8 @@ getDatesInRange(startDate, endDate) {
         },
     };
 }
+
+
 
 function generateDateRange(dates) {
     const result = [];
