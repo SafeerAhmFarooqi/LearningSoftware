@@ -1,7 +1,13 @@
 <div>
     <div class="calendar-container" 
-         x-data="calendarApp({{ json_encode($multiSelect) }}, '{{ $picker }}', {{ json_encode($preOccupiedDates) }}, {{ json_encode($disableDates) }})" 
-         x-init="generateCalendar()">
+        x-data="calendarApp(
+            {{ json_encode($multiSelect) }}, 
+            '{{ $picker }}', 
+            {{ json_encode($preOccupiedDates) }}, 
+            {{ json_encode($disableDates) }}, 
+            '{{ $initialMonthYear }}'
+        )" 
+        x-init="generateCalendar()">
        <!-- Dynamic Input Field -->
        <input 
         wire:model="selectedDates"
@@ -24,12 +30,12 @@
            <div class="navigation">
                <button type="button" @click="prevMonth()"> &lt; Prev </button>
                <div class="month">
-                   <select x-model="currentMonth" @change="generateCalendar()">
-                       <template x-for="(month, index) in months">
-                           <option :value="index" x-text="month"></option>
-                       </template>
-                   </select>
-               </div>
+                <select x-model="currentMonth" @change="generateCalendar()" x-init="$nextTick(() => $el.value = currentMonth)">
+                    <template x-for="(month, index) in months">
+                        <option :value="index" x-text="month"></option>
+                    </template>
+                </select>
+            </div>
                <div class="year">
                    <input type="number" x-model="currentYear" @input="generateCalendar()" placeholder="Year" min="1900" max="2100">
                </div>
@@ -66,15 +72,20 @@
 
 @assets
 <script>
-   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = []) {
+   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear) {
+    console.log(initialMonthYear);
     return {
         open: false,
         multiSelect: multiSelect === true || multiSelect === 'true', // Ensure boolean
         picker,
         preOccupiedDates: generateDateRange(preOccupiedDates),
         disableDates: generateDateRange(disableDates),
-        currentMonth: new Date().getMonth(),
-        currentYear: new Date().getFullYear(),
+        currentMonth: initialMonthYear && initialMonthYear.includes('-') 
+            ? parseInt(initialMonthYear.split('-')[1]) - 1 
+            : new Date().getMonth(),
+        currentYear: initialMonthYear && initialMonthYear.includes('-') 
+            ? parseInt(initialMonthYear.split('-')[0]) 
+            : new Date().getFullYear(),
         selectedDates: [], // To store dates for 'single' mode
         selectedRanges: [], // To store ranges for 'range' mode
         calendarDays: [],
