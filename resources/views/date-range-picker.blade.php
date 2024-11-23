@@ -34,6 +34,10 @@
                     [
                         'startDate' => '2024-12-26', //Y-m-d
                         'endDate' => '2024-12-26', //Y-m-d
+                    ],
+                    [
+                        'startDate' => '2024-12-1', //Y-m-d
+                        'endDate' => '2024-12-4', //Y-m-d
                     ]
                 ],
                 'disableDates' => [//selected dates from backened

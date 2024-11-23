@@ -287,16 +287,25 @@ isRangeOverlapping(newRange) {
 function generateDateRange(dates) {
     const result = [];
     dates.forEach(range => {
-        if (!range.startDate) return;
-        const start = new Date(range.startDate);
-        const end = range.endDate ? new Date(range.endDate) : start;
+        if (!range.startDate) return; // Skip if no startDate
+
+        // Parse the dates and ensure they are treated as local dates
+        let start = new Date(`${range.startDate}T00:00:00`);
+        const end = range.endDate
+            ? new Date(`${range.endDate}T00:00:00`)
+            : new Date(`${range.startDate}T00:00:00`);
+
+        // Iterate through the range and include all dates
         while (start <= end) {
-            result.push(start.toISOString().split('T')[0]);
-            start.setDate(start.getDate() + 1);
+            result.push(
+                `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`
+            );
+            start.setDate(start.getDate() + 1); // Increment date correctly
         }
     });
     return result;
 }
+
 
 
 
