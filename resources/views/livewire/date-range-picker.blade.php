@@ -140,7 +140,6 @@ handleDateClick(date, isDisabled, isPreOccupied) {
     if (isDisabled || isPreOccupied) return;
 
     const isRangeInvalid = (range) => {
-        // Check if any date in the range is disabled, pre-occupied, or overlaps an existing range
         if (range.length < 2) return false; // Skip incomplete ranges
         return (
             range.some(date => this.disableDates.includes(date) || this.preOccupiedDates.includes(date)) ||
@@ -149,7 +148,6 @@ handleDateClick(date, isDisabled, isPreOccupied) {
     };
 
     if (this.picker === 'single') {
-        // Single picker logic remains unchanged
         if (this.multiSelect) {
             if (this.selectedDates.includes(date)) {
                 this.selectedDates = this.selectedDates.filter(d => d !== date);
@@ -161,7 +159,6 @@ handleDateClick(date, isDisabled, isPreOccupied) {
         }
     } else if (this.picker === 'range') {
         if (!this.multiSelect) {
-            // Single range logic remains unchanged
             if (this.selectedRanges.length === 1) {
                 const lastRange = this.selectedRanges[0];
 
@@ -181,7 +178,6 @@ handleDateClick(date, isDisabled, isPreOccupied) {
                 this.selectedRanges = [[date]];
             }
         } else {
-            // Multi-range logic with overlap check
             const lastRange = this.selectedRanges[this.selectedRanges.length - 1];
 
             if (lastRange && lastRange.length === 1) {
@@ -203,9 +199,16 @@ handleDateClick(date, isDisabled, isPreOccupied) {
         }
     }
 
+    // Cleanup step to remove empty subarrays and return [] if all are empty
+    this.selectedRanges = this.selectedRanges.filter(range => range.length > 0);
+    if (this.selectedRanges.length === 0) {
+        this.selectedRanges = [];
+    }
+
     console.log('Selected Dates:', JSON.stringify(this.selectedDates));
     console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
 },
+
 
 isRangeOverlapping(newRange) {
     // Check only complete ranges (start and end dates present)
