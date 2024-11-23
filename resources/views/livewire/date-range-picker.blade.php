@@ -140,69 +140,64 @@ handleDateClick(date, isDisabled, isPreOccupied) {
     if (isDisabled || isPreOccupied) return;
 
     const isRangeInvalid = (range) => {
-        // Check if any date in the range is either disabled or pre-occupied
-        return range.some(date => this.disableDates.includes(date) || this.preOccupiedDates.includes(date));
+        // Check if any date in the range is disabled, pre-occupied, or overlaps an existing range
+        if (range.length < 2) return false; // Skip incomplete ranges
+        return (
+            range.some(date => this.disableDates.includes(date) || this.preOccupiedDates.includes(date)) ||
+            this.isRangeOverlapping(range)
+        );
     };
 
     if (this.picker === 'single') {
-        // Single picker mode: append or remove dates based on multiSelect
+        // Single picker logic remains unchanged
         if (this.multiSelect) {
-            // Add or remove individual dates for multi-select
             if (this.selectedDates.includes(date)) {
-                this.selectedDates = this.selectedDates.filter(d => d !== date); // Remove if already selected
+                this.selectedDates = this.selectedDates.filter(d => d !== date);
             } else {
-                this.selectedDates.push(date); // Add the new date
+                this.selectedDates.push(date);
             }
         } else {
-            // Single selection only
             this.selectedDates = [date];
         }
     } else if (this.picker === 'range') {
-        // Range picker logic
         if (!this.multiSelect) {
-            // Single range selection
+            // Single range logic remains unchanged
             if (this.selectedRanges.length === 1) {
                 const lastRange = this.selectedRanges[0];
 
                 if (lastRange.length === 1 && lastRange[0] === date) {
-                    // Same date clicked twice, treat it as a range with the date repeated
                     this.selectedRanges = [[date, date]];
                 } else {
-                    // Complete the range with the second click
                     const range = this.getDatesInRange(lastRange[0], date);
 
                     if (isRangeInvalid(range)) {
-                        console.log('Invalid range due to disabled or preoccupied dates');
-                        this.selectedRanges = []; // Clear invalid range
+                        console.log('Invalid range due to disabled, preoccupied dates, or overlapping ranges');
+                        this.selectedRanges = [];
                     } else {
                         this.selectedRanges = [range];
                     }
                 }
             } else {
-                // Start a new range
                 this.selectedRanges = [[date]];
             }
         } else {
-            // Multi-range selection
+            // Multi-range logic with overlap check
             const lastRange = this.selectedRanges[this.selectedRanges.length - 1];
 
             if (lastRange && lastRange.length === 1) {
                 if (lastRange[0] === date) {
-                    // Same date clicked twice, treat it as a range with the date repeated
                     this.selectedRanges[this.selectedRanges.length - 1] = [date, date];
                 } else {
-                    // Complete the current range
                     const range = this.getDatesInRange(lastRange[0], date);
 
                     if (isRangeInvalid(range)) {
-                        console.log('Invalid range due to disabled or preoccupied dates');
-                        this.selectedRanges.pop(); // Remove the incomplete range
+                        console.log('Invalid range due to disabled, preoccupied dates, or overlapping ranges');
+                        this.selectedRanges.pop();
                     } else {
                         this.selectedRanges[this.selectedRanges.length - 1] = range;
                     }
                 }
             } else {
-                // Start a new range
                 this.selectedRanges.push([date]);
             }
         }
@@ -210,6 +205,23 @@ handleDateClick(date, isDisabled, isPreOccupied) {
 
     console.log('Selected Dates:', JSON.stringify(this.selectedDates));
     console.log('Selected Ranges:', JSON.stringify(this.selectedRanges));
+},
+
+isRangeOverlapping(newRange) {
+    // Check only complete ranges (start and end dates present)
+    const [newStart, newEnd] = [new Date(newRange[0]), new Date(newRange[newRange.length - 1])];
+    if (!newStart || !newEnd) return false; // Skip incomplete ranges
+
+    return this.selectedRanges.some(existingRange => {
+        if (existingRange.length < 2) return false; // Skip incomplete existing ranges
+        const [existingStart, existingEnd] = [
+            new Date(existingRange[0]),
+            new Date(existingRange[existingRange.length - 1]),
+        ];
+
+        // Check for overlap
+        return newStart <= existingEnd && newEnd >= existingStart;
+    });
 },
 
 
