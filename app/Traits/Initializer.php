@@ -6,6 +6,7 @@
     public function initialize(){
         $this->setInputAttributes();
         $this->initializeDates();
+        $this->getLivewireHoverData($this->initialMonthYear);
     }
 
     public function setInputAttributes(){

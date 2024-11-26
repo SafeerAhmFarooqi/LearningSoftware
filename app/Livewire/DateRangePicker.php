@@ -15,7 +15,6 @@ class DateRangePicker extends Component
 
     public function mount(){
        $this->initialize();
-       $this->getLivewireHoverData($this->initialMonthYear);
     }
     
     public function getLivewireHoverData($currentMonthYear){
