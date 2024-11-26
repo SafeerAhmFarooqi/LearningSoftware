@@ -5,7 +5,8 @@
             '{{ $picker }}', 
             {{ json_encode($preOccupiedDates) }}, 
             {{ json_encode($disableDates) }}, 
-            '{{ $initialMonthYear }}'
+            '{{ $initialMonthYear }}',
+            {{ json_encode($livewireHoverData) }} 
         )" 
         x-init="generateCalendar()">
        <!-- Dynamic Input Field -->
@@ -75,7 +76,7 @@
 
 @assets
 <script>
-   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear) {
+   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear, livewireHoverData) {
     console.log(initialMonthYear);
     return {
         open: false,
@@ -92,6 +93,7 @@
         selectedDates: [], // To store dates for 'single' mode
         selectedRanges: [], // To store ranges for 'range' mode
         calendarDays: [],
+        livewireHoverData : livewireHoverData,
         hoverText : '',
         hoverData: {},
         months: [
@@ -109,7 +111,7 @@
                 days.push({ label: "", empty: true });
             }
             for (let i = 1; i <= daysInMonth; i++) {
-                const date = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const date = `${this.currentYear}-${parseInt(this.currentMonth) + 1}-${String(i).padStart(2, '0')}`;
                 days.push({
                     label: i,
                     date,
@@ -122,19 +124,32 @@
             this.loadHoverData();
         },
         loadHoverData() {
-            console.log('hovering initiated');
-            console.log(this.currentYear);
-            console.log(parseInt(this.currentMonth) + 1);
-            this.hoverData = {};
-            this.calendarDays.forEach(day => {
-                if (!day.empty) {
-                    // Construct the date manually using `day.label`, `currentMonth`, and `currentYear`
-                    const formattedDate = `${this.currentYear}-${parseInt(this.currentMonth) + 1}-${String(day.label).padStart(2, '0')}`;
-                    //console.log(formattedDate); // Log the formatted date for debugging
-                    this.hoverData[day.date] = `Welcome - ${formattedDate}`;
-                }
-            });
-        },
+    this.hoverData = {};
+    const monthYear = `${this.currentYear}-${parseInt(this.currentMonth) + 1}`;
+
+    // Call the Livewire method
+    @this.call('getLivewireHoverData', monthYear)
+        .then(livewireHoverData => {
+            if (livewireHoverData && typeof livewireHoverData === 'object') {
+                this.calendarDays.forEach(day => {
+                    if (!day.empty) {
+                        const formattedDate = `${this.currentYear}-${parseInt(this.currentMonth) + 1}-${String(day.label).padStart(2, '0')}`;
+                     
+                        // Safely access livewireHoverData
+                        this.hoverData[formattedDate] = 
+                        (livewireHoverData[day.label] !== undefined && livewireHoverData[day.label] !== null && livewireHoverData[day.label] !== '') 
+                            ? livewireHoverData[day.label] 
+                            : `Welcome - ${formattedDate}`;
+                    }
+                });
+            } else {
+                console.error('Invalid hover data received:', livewireHoverData);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching hover data:', error);
+        });
+},
         getHoverText(date) {
             return this.hoverData[date] || "";
         },

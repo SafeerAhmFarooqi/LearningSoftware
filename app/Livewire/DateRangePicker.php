@@ -19,6 +19,10 @@ class DateRangePicker extends Component
     }
     
     public function getLivewireHoverData($currentMonthYear){
+        return [
+            1 => "First Hover Data for the month {$currentMonthYear}",
+            2 => "Second Hover Data for the month {$currentMonthYear}",
+        ];
         $this->livewireHoverData = [
             1 => "First Hover Data for the month {$currentMonthYear}",
             2 => "Second Hover Data for the month {$currentMonthYear}",
