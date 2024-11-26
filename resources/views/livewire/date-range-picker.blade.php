@@ -57,8 +57,11 @@
                          'pre-occupied': preOccupiedDates.includes(day.date),
                          'disabled': disableDates.includes(day.date)
                      }"
+                     @mouseenter="hoverText = getHoverText(day.date)"
+                     @mouseleave="hoverText = ''"
                      @click="handleDateClick(day.date, day.disabled, day.preOccupied)">
                     <span x-text="day.label"></span>
+                    <div class="hover-info" x-show="hoverText && !day.empty" x-text="hoverText"></div>
                 </div>
             </template>
             
@@ -89,6 +92,8 @@
         selectedDates: [], // To store dates for 'single' mode
         selectedRanges: [], // To store ranges for 'range' mode
         calendarDays: [],
+        hoverText : '',
+        hoverData: {},
         months: [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
@@ -114,6 +119,24 @@
                 });
             }
             this.calendarDays = days;
+            this.loadHoverData();
+        },
+        loadHoverData() {
+            console.log('hovering initiated');
+            console.log(this.currentYear);
+            console.log(parseInt(this.currentMonth) + 1);
+            this.hoverData = {};
+            this.calendarDays.forEach(day => {
+                if (!day.empty) {
+                    // Construct the date manually using `day.label`, `currentMonth`, and `currentYear`
+                    const formattedDate = `${this.currentYear}-${parseInt(this.currentMonth) + 1}-${String(day.label).padStart(2, '0')}`;
+                    //console.log(formattedDate); // Log the formatted date for debugging
+                    this.hoverData[day.date] = `Welcome - ${formattedDate}`;
+                }
+            });
+        },
+        getHoverText(date) {
+            return this.hoverData[date] || "";
         },
         handleCalendarHide() {
     this.open = false;
@@ -312,6 +335,26 @@ function generateDateRange(dates) {
 </script>
 
 <style>
+    .hover-info {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.day:hover .hover-info {
+    opacity: 1;
+}
  body, html {
     overflow: visible;
 }
