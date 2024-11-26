@@ -23,10 +23,6 @@ class DateRangePicker extends Component
             1 => "First Hover Data for the month {$currentMonthYear}",
             2 => "Second Hover Data for the month {$currentMonthYear}",
         ];
-        $this->livewireHoverData = [
-            1 => "First Hover Data for the month {$currentMonthYear}",
-            2 => "Second Hover Data for the month {$currentMonthYear}",
-        ];
     }
     public function render()
     {

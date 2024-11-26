@@ -5,8 +5,7 @@
             '{{ $picker }}', 
             {{ json_encode($preOccupiedDates) }}, 
             {{ json_encode($disableDates) }}, 
-            '{{ $initialMonthYear }}',
-            {{ json_encode($livewireHoverData) }} 
+            '{{ $initialMonthYear }}' 
         )" 
         x-init="generateCalendar()">
        <!-- Dynamic Input Field -->
@@ -76,8 +75,7 @@
 
 @assets
 <script>
-   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear, livewireHoverData) {
-    console.log(initialMonthYear);
+   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear) {
     return {
         open: false,
         multiSelect: multiSelect === true || multiSelect === 'true', // Ensure boolean
@@ -93,7 +91,7 @@
         selectedDates: [], // To store dates for 'single' mode
         selectedRanges: [], // To store ranges for 'range' mode
         calendarDays: [],
-        livewireHoverData : livewireHoverData,
+        livewireHoverData : '',
         hoverText : '',
         hoverData: {},
         months: [
