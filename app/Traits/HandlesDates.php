@@ -31,6 +31,10 @@ trait HandlesDates
         $this->disableDates = $this->validateAndFormatDateRange($this->disableDates);
     }
 
+    public function clearSelection(){
+        $this->selectedDates = [];
+    }
+
     /**
      * Validate and format the initialMonthYear property.
      *

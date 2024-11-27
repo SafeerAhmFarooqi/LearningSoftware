@@ -66,6 +66,14 @@
             </template>
             
            </div>
+           <div class="clear-container">
+            <button 
+                type="button" 
+                @click="clearSelection()" 
+                class="clear-button">
+                Clear Selection
+            </button>
+        </div>
        </div>
     </div>
 </div>
@@ -99,6 +107,22 @@
             "July", "August", "September", "October", "November", "December"
         ],
         weekdays: ["S", "M", "T", "W", "T", "F", "S"],
+        clearSelection() {
+            if (this.picker === 'single') {
+                this.selectedDates = [];
+            } else if (this.picker === 'range') {
+                this.selectedRanges = [];
+            }
+            
+            // Reset hover text
+            this.hoverText = '';
+
+            // Call Livewire method to clear backend state
+            @this.call('clearSelection');
+
+            console.log('Selections cleared');
+            this.loadHoverData();
+        },
 
         generateCalendar() {
             const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
@@ -348,6 +372,24 @@ function generateDateRange(dates) {
 </script>
 
 <style>
+    .clear-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.clear-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-button:hover {
+    background-color: #cc0000;
+}
     .hover-info {
     position: absolute;
     top: -20px;
