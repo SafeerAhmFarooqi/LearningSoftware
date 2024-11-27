@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\DateRangeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +26,4 @@ Route::get('/date-range-picker-2', function () {
     return view('date-range-picker-2');
 });
 
-Route::post('/date-range-picker', function (Request $request) {
-    dd($request->all());
-})->name('booking.date');
+Route::post('/date-range-picker', [DateRangeController::class, 'submit'])->name('booking.date');
