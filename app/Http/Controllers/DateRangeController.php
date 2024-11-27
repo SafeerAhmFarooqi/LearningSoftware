@@ -4,19 +4,36 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class DateRangeController extends MasterController
 {
     public function submit(Request $request)
     {
-        // Fetch input data
-        //dd($request->all());
-        $datesInput = $request->input('selectedRanges', $request->input('selectedDates', ''));
-
         // Auto-detect and process the input
-        $result = $this->processInput($datesInput);
+        $dates = $this->processInput($request->input('selectedRanges', $request->input('selectedDates', '')));
 
-        return response()->json($result);
+        //For picker type set to single and multi select set to true or false 
+        foreach ($dates as $date) {
+            Log::info($date);
+        }
+
+        //For picker type set to single and multi select set to false
+        Log::info($date[0]);
+
+        //For picker type set to range and multi select set to true or false
+        foreach ($dates as $range) {
+            foreach ($range as $date) {
+                Log::info($date);
+            }
+        }
+
+        //For picker type set to range and multi select set to false
+        foreach ($dates[0] as $date) {
+            Log::info($date);
+        }
+
+        return response()->json($dates);
     }
 
     private function processInput($input)
