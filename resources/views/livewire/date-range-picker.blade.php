@@ -16,7 +16,9 @@
         x-bind:value="picker === 'range' 
                         ? selectedRanges.map(range => `[${range.join(', ')}]`).join(', ') 
                         : selectedDates.join(', ')"
-        x-bind:name="picker === 'range' ? 'selectedRanges' : 'selectedDates'"
+        x-bind:name="{{ isset($inputAttributes['name']) 
+                        ? "'" . e($inputAttributes['name']) . "'" 
+                        : "(picker === 'range' ? 'selectedRanges' : 'selectedDates')" }}"
         @foreach ($inputAttributes as $keyAttribute => $inputAttribute)
             @if (!is_string($inputAttribute)) @continue @endif
             {{ ' ' }}{{ $keyAttribute }}="{{ e($inputAttribute) }}"

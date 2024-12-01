@@ -11,26 +11,28 @@ class DateRangeController extends MasterController
     public function submit(Request $request)
     {
         // Auto-detect and process the input
-        $dates = $this->processInput($request->input('selectedRanges', $request->input('selectedDates', '')));
+        $dates = $this->processInput($request->input('booking_range'));
+
+        //For picker type set to single and multi select set to false
+        Log::info($dates[0]);
+
+        
 
         //For picker type set to single and multi select set to true or false 
         foreach ($dates as $date) {
             Log::info($date);
         }
 
-        //For picker type set to single and multi select set to false
-        Log::info($date[0]);
+        //For picker type set to range and multi select set to false
+        foreach ($dates[0] as $date) {
+            Log::info($date);
+        }
 
         //For picker type set to range and multi select set to true or false
         foreach ($dates as $range) {
             foreach ($range as $date) {
                 Log::info($date);
             }
-        }
-
-        //For picker type set to range and multi select set to false
-        foreach ($dates[0] as $date) {
-            Log::info($date);
         }
 
         return response()->json($dates);
