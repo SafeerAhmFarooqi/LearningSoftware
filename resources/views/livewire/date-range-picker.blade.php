@@ -389,10 +389,12 @@ function generateDateRange(dates) {
 }
 
 .__saf_date_picker-calendar {
+    max-width: 400px; /* Set a max-width for consistency */
+    margin: 0 auto; /* Center the calendar */
     position: absolute;
     top: calc(100% + 5px);
     left: 0;
-    width: 320px;
+    width: 400px;
     padding: 20px;
     background-color: #ffffff;
     border: 1px solid #e3e3e3;
