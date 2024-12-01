@@ -10,7 +10,7 @@ class DateRangeController extends MasterController
 {
     public function submit(Request $request)
     {
-        //dd($request->all());
+        dd($request->all());
         // Auto-detect and process the input
         //if name attribute is not set then picker type single defaults to selectedDates and picker type range defaults to selectedRanges
         $dates = $this->processInput($request->input('selectedDates')); 

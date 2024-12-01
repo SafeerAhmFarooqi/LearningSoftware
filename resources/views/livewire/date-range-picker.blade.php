@@ -1,5 +1,5 @@
 <div>
-    <div class="calendar-container" 
+    <div class="__saf_date_picker-calendar-container" 
         x-data="calendarApp(
             {{ json_encode($multiSelect) }}, 
             '{{ $picker }}', 
@@ -29,57 +29,58 @@
    />
 
        <!-- Calendar -->
-       <div class="calendar" x-show="open" x-transition x-cloak @click.outside="handleCalendarHide()">
-           <div class="navigation">
+       <div class="__saf_date_picker-calendar" x-show="open" x-transition x-cloak @click.outside="handleCalendarHide()">
+           <div class="__saf_date_picker-navigation">
                <button type="button" @click="prevMonth()"> &lt; Prev </button>
-               <div class="month">
+               <div class="__saf_date_picker-month">
                 <select x-model="currentMonth" @change="generateCalendar()" x-init="$nextTick(() => $el.value = currentMonth)">
                     <template x-for="(month, index) in months">
                         <option :value="index" x-text="month"></option>
                     </template>
                 </select>
             </div>
-               <div class="year">
+               <div class="__saf_date_picker-year">
                    <input type="number" x-model="currentYear" @input="generateCalendar()" placeholder="Year" min="1900" max="2100">
                </div>
                <button type="button" @click="nextMonth()"> Next &gt; </button>
            </div>
 
-           <div class="days">
+           <div class="__saf_date_picker-days">
                <!-- Weekday Headers -->
                <template x-for="day in weekdays">
-                   <div class="day header" x-text="day"></div>
+                   <div class="__saf_date_picker-day __saf_date_picker-header" x-text="day"></div>
                </template>
 
                <!-- Dynamic Calendar Days -->
                <template x-for="day in calendarDays">
-                <div class="day"
+                <div class="__saf_date_picker-day"
                      :class="{
-                         'empty': day.empty, 
-                         'selected': isSelected(day.date),
-                         'pre-occupied': preOccupiedDates.includes(day.date),
-                         'disabled': disableDates.includes(day.date)
+                         '__saf_date_picker-empty': day.empty, 
+                         '__saf_date_picker-selected': isSelected(day.date),
+                         '__saf_date_picker-pre-occupied': preOccupiedDates.includes(day.date),
+                         '__saf_date_picker-disabled': disableDates.includes(day.date)
                      }"
                      @mouseenter="hoverText = getHoverText(day.date)"
                      @mouseleave="hoverText = ''"
                      @click="handleDateClick(day.date, day.disabled, day.preOccupied)">
                     <span x-text="day.label"></span>
-                    <div class="hover-info" x-show="hoverText && !day.empty" x-text="hoverText"></div>
+                    <div class="__saf_date_picker-hover-info" x-show="hoverText && !day.empty" x-text="hoverText"></div>
                 </div>
             </template>
             
            </div>
-           <div class="clear-container">
+           <div class="__saf_date_picker-clear-container">
             <button 
                 type="button" 
                 @click="clearSelection()" 
-                class="clear-button">
+                class="__saf_date_picker-clear-button">
                 Clear Selection
             </button>
         </div>
        </div>
     </div>
 </div>
+
 
 
 
@@ -376,18 +377,18 @@ function generateDateRange(dates) {
 </script>
 
 <style>
-  body, html {
+ body, html {
     overflow: visible;
     font-family: 'Arial', sans-serif;
 }
 
-.calendar-container {
+.__saf_date_picker-calendar-container {
     position: relative;
     display: inline-block;
     overflow: visible;
 }
 
-.calendar {
+.__saf_date_picker-calendar {
     position: absolute;
     top: calc(100% + 5px);
     left: 0;
@@ -401,18 +402,18 @@ function generateDateRange(dates) {
     transition: opacity 0.3s ease-in-out;
 }
 
-.calendar[x-show="true"] {
+.__saf_date_picker-calendar[x-show="true"] {
     display: block;
 }
 
-.navigation {
+.__saf_date_picker-navigation {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.navigation button {
+.__saf_date_picker-navigation button {
     background-color: #007bff;
     color: #ffffff;
     border: none;
@@ -423,11 +424,12 @@ function generateDateRange(dates) {
     transition: background-color 0.3s;
 }
 
-.navigation button:hover {
+.__saf_date_picker-navigation button:hover {
     background-color: #0056b3;
 }
 
-.navigation select, .navigation input[type="number"] {
+.__saf_date_picker-navigation select, 
+.__saf_date_picker-navigation input[type="number"] {
     border: 1px solid #ccc;
     padding: 5px 10px;
     border-radius: 5px;
@@ -437,17 +439,17 @@ function generateDateRange(dates) {
     width: auto;
 }
 
-.navigation select {
+.__saf_date_picker-navigation select {
     cursor: pointer;
 }
 
-.days {
+.__saf_date_picker-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
 }
 
-.day {
+.__saf_date_picker-day {
     padding: 10px;
     text-align: center;
     border: 1px solid transparent;
@@ -457,12 +459,12 @@ function generateDateRange(dates) {
     font-size: 14px;
 }
 
-.day.empty {
+.__saf_date_picker-day.__saf_date_picker-empty {
     background-color: transparent;
     cursor: default;
 }
 
-.day.selected {
+.__saf_date_picker-day.__saf_date_picker-selected {
     background-color: #007bff;
     color: #ffffff;
     font-weight: bold;
@@ -470,26 +472,26 @@ function generateDateRange(dates) {
     transform: scale(1.1);
 }
 
-.day.pre-occupied {
+.__saf_date_picker-day.__saf_date_picker-pre-occupied {
     background-color: #ffcc00;
     color: #333;
     font-style: italic;
     cursor: not-allowed;
 }
 
-.day.disabled {
+.__saf_date_picker-day.__saf_date_picker-disabled {
     text-decoration: line-through;
     color: #999;
     cursor: not-allowed;
 }
 
-.day:hover:not(.empty):not(.disabled):not(.pre-occupied) {
+.__saf_date_picker-day:hover:not(.__saf_date_picker-empty):not(.__saf_date_picker-disabled):not(.__saf_date_picker-pre-occupied) {
     background-color: #f0f8ff;
     color: #007bff;
     transform: scale(1.05);
 }
 
-.header {
+.__saf_date_picker-header {
     font-weight: bold;
     text-align: center;
     color: #555;
@@ -497,7 +499,7 @@ function generateDateRange(dates) {
     border-bottom: 1px solid #e3e3e3;
 }
 
-.hover-info {
+.__saf_date_picker-hover-info {
     position: absolute;
     top: -30px;
     left: 50%;
@@ -514,16 +516,16 @@ function generateDateRange(dates) {
     transition: opacity 0.2s ease-in-out;
 }
 
-.day:hover .hover-info {
+.__saf_date_picker-day:hover .__saf_date_picker-hover-info {
     opacity: 1;
 }
 
-.clear-container {
+.__saf_date_picker-clear-container {
     margin-top: 20px;
     text-align: center;
 }
 
-.clear-button {
+.__saf_date_picker-clear-button {
     background-color: #ff4d4d;
     color: white;
     padding: 10px 20px;
@@ -534,10 +536,11 @@ function generateDateRange(dates) {
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.clear-button:hover {
+.__saf_date_picker-clear-button:hover {
     background-color: #cc0000;
     transform: scale(1.05);
 }
+
 
 </style>
 <script>
