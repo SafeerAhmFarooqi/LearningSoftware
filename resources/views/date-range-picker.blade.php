@@ -20,8 +20,17 @@
             @livewire('date-range-picker', [
                 'inputAttributes' => [
                     'name' => 'booking_range',//if left empty default to selectedRanges for picker range and selectedDates for picker single
-                    //'id' => 'booking_range',
+                    'id' => 'booking_range',
                     'class' => 'form-control',
+                    'style' => 'width: 100%;
+                                padding: 10px;
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                font-size: 14px;
+                                color: #333;
+                                outline: none;
+                                background-color: #f9f9f9;
+                                transition: border-color 0.3s;',
                 ],  
                 'picker' => 'range',  //single,range defaults to single
                 'multiSelect' => true, //true,false defaults to false

@@ -376,96 +376,103 @@ function generateDateRange(dates) {
 </script>
 
 <style>
-    .clear-container {
-    margin-top: 10px;
-    text-align: center;
-}
-
-.clear-button {
-    background-color: #ff4d4d;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.clear-button:hover {
-    background-color: #cc0000;
-}
-    .hover-info {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
-    border-radius: 3px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 10;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.day:hover .hover-info {
-    opacity: 1;
-}
- body, html {
+  body, html {
     overflow: visible;
+    font-family: 'Arial', sans-serif;
 }
 
 .calendar-container {
     position: relative;
     display: inline-block;
-    overflow: visible; /* Ensure the calendar is not clipped */
+    overflow: visible;
 }
 
 .calendar {
     position: absolute;
     top: calc(100% + 5px);
     left: 0;
-    width: 300px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    width: 320px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .calendar[x-show="true"] {
     display: block;
 }
 
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.navigation button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.navigation button:hover {
+    background-color: #0056b3;
+}
+
+.navigation select, .navigation input[type="number"] {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    width: auto;
+}
+
+.navigation select {
+    cursor: pointer;
+}
+
 .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
 }
 
 .day {
     padding: 10px;
     text-align: center;
-    border: 1px solid #ddd;
+    border: 1px solid transparent;
+    border-radius: 50%;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 14px;
 }
 
 .day.empty {
-    background-color: #f9f9f9;
+    background-color: transparent;
     cursor: default;
 }
 
 .day.selected {
     background-color: #007bff;
-    color: white;
+    color: #ffffff;
     font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    transform: scale(1.1);
 }
 
 .day.pre-occupied {
-    background-color: #2bff00;
-    color: rgb(0, 0, 0);
+    background-color: #ffcc00;
+    color: #333;
     font-style: italic;
     cursor: not-allowed;
 }
@@ -476,17 +483,60 @@ function generateDateRange(dates) {
     cursor: not-allowed;
 }
 
-.navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+.day:hover:not(.empty):not(.disabled):not(.pre-occupied) {
+    background-color: #f0f8ff;
+    color: #007bff;
+    transform: scale(1.05);
 }
 
 .header {
     font-weight: bold;
     text-align: center;
-    background-color: #f3f3f3;
+    color: #555;
+    padding: 10px 0;
+    border-bottom: 1px solid #e3e3e3;
+}
+
+.hover-info {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.day:hover .hover-info {
+    opacity: 1;
+}
+
+.clear-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.clear-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.clear-button:hover {
+    background-color: #cc0000;
+    transform: scale(1.05);
 }
 
 </style>
