@@ -10,8 +10,10 @@ class DateRangeController extends MasterController
 {
     public function submit(Request $request)
     {
+        //dd($request->all());
         // Auto-detect and process the input
-        $dates = $this->processInput($request->input('booking_range'));
+        //if name attribute is not set then picker type single defaults to selectedDates and picker type range defaults to selectedRanges
+        $dates = $this->processInput($request->input('selectedDates')); 
 
         //For picker type set to single and multi select set to false
         Log::info($dates[0]);
