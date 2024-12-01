@@ -20,7 +20,7 @@
             @livewire('date-range-picker', [
                 'inputAttributes' => [
                     'name' => 'booking_range',//if left empty default to selectedRanges for picker range and selectedDates for picker single
-                    'id' => 'booking_range',
+                    //'id' => 'booking_range',
                     'class' => 'form-control',
                 ],  
                 'picker' => 'range',  //single,range defaults to single

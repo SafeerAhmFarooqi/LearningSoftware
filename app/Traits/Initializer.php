@@ -12,7 +12,6 @@
     public function setInputAttributes(){
         $this->filterInputAttributes('wire:model','type');
         $this->removeDuplicationFromInputAttributes();
-        $this->setInputAttribute('id','__saf__date_range_picker',true);
         $this->setInputAttribute('placeholder','Please Select Date',true);
     }
 
