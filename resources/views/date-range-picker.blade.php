@@ -26,6 +26,7 @@
                 'picker' => 'range',  //single,range defaults to single
                 'multiSelect' => true, //true,false defaults to false
                 'initialMonthYear' => '2024-10',
+                'defaultHoverText' => '',//if left empty it will default to current date
                 'preOccupiedDates' => [//selected dates from backened
                     [
                         'startDate' => '2024-12-25', //Y-m-d

@@ -5,7 +5,8 @@
             '{{ $picker }}', 
             {{ json_encode($preOccupiedDates) }}, 
             {{ json_encode($disableDates) }}, 
-            '{{ $initialMonthYear }}' 
+            '{{ $initialMonthYear }}',
+            '{{ $defaultHoverText }}' 
         )" 
         x-init="generateCalendar()">
        <!-- Dynamic Input Field -->
@@ -83,11 +84,12 @@
 
 @assets
 <script>
-   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear) {
+   function calendarApp(multiSelect = false, picker = 'single', preOccupiedDates = [], disableDates = [], initialMonthYear, defaultHoverText = '') {
     return {
         open: false,
         multiSelect: multiSelect === true || multiSelect === 'true', // Ensure boolean
         picker,
+        defaultHoverText : defaultHoverText,
         preOccupiedDates: generateDateRange(preOccupiedDates),
         disableDates: generateDateRange(disableDates),
         currentMonth: initialMonthYear && initialMonthYear.includes('-') 
@@ -161,7 +163,7 @@
                         this.hoverData[formattedDate] = 
                         (livewireHoverData[day.label] !== undefined && livewireHoverData[day.label] !== null && livewireHoverData[day.label] !== '') 
                             ? livewireHoverData[day.label] 
-                            : `Welcome - ${formattedDate}`;
+                            : (defaultHoverText ? defaultHoverText : `${formattedDate}`);
                     }
                 });
             } else {
